@@ -1,0 +1,23 @@
+name: Build and Deploy
+
+on: [release]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        run: |
+          git clone https://github.com/USERNAME/REPOSITORY.git
+          cd REPOSITORY
+      - name: Compile binary
+        run: go build -o my-binary main.go
+      - name: Upload binary to DigitalOcean
+        run: |
+          scp -i ~/.ssh/id_rsa my-binary ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }}:/tmp/my-binary
+      - name: Retrieve environment variables from DigitalOcean
+        run: |
+          VARS=$(ssh -i ~/.ssh/id_rsa ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} "printenv")
+      - name: Run binary on DigitalOcean
+        run: |
+          ssh -i ~/.ssh/id_rsa -t ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} "cd /tmp && $VARS ./my-binary"
