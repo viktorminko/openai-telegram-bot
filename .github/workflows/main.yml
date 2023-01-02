@@ -12,7 +12,9 @@ jobs:
           cd openai-telegram-bot
           ls -al
       - name: Compile binary
-        run: go build -o my-binary ./...
+        run: |
+          ls -al
+          go build -o my-binary ./...
       - name: Upload binary to DigitalOcean
         run: |
           scp -i ~/.ssh/id_rsa my-binary ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }}:/tmp/my-binary
