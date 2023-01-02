@@ -11,7 +11,7 @@ jobs:
           git clone https://github.com/viktorminko/openai-telegram-bot.git
           cd openai-telegram-bot
       - name: Compile binary
-        run: go build -o my-binary main.go
+        run: go build -o my-binary ./...
       - name: Upload binary to DigitalOcean
         run: |
           scp -i ~/.ssh/id_rsa my-binary ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }}:/tmp/my-binary
