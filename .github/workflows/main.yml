@@ -1,6 +1,6 @@
 name: Build and Deploy
 
-on: [release]
+on: [push]
 
 jobs:
   build:
@@ -10,6 +10,7 @@ jobs:
         run: |
           git clone https://github.com/viktorminko/openai-telegram-bot.git
           cd openai-telegram-bot
+          ls -al
       - name: Compile binary
         run: go build -o my-binary ./...
       - name: Upload binary to DigitalOcean
