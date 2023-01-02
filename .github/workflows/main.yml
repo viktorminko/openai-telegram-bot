@@ -9,7 +9,7 @@ jobs:
       - name: Check out repository
         run: |
           git clone https://github.com/viktorminko/openai-telegram-bot.git
-          cd REPOSITORY
+          cd openai-telegram-bot
       - name: Compile binary
         run: go build -o my-binary main.go
       - name: Upload binary to DigitalOcean
