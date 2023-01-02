@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Check out repository
         run: |
-          git clone https://github.com/USERNAME/REPOSITORY.git
+          git clone https://github.com/viktorminko/openai-telegram-bot.git
           cd REPOSITORY
       - name: Compile binary
         run: go build -o my-binary main.go
