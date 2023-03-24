@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os/exec"
 	"time"
 )
@@ -25,7 +25,7 @@ func convertOggToMp3(oggData []byte, duration time.Duration) ([]byte, error) {
 	cmd.Stdin = reader
 	var mp3Buffer bytes.Buffer
 	cmd.Stdout = &mp3Buffer
-	cmd.Stderr = ioutil.Discard
+	cmd.Stderr = io.Discard
 
 	// Execute the command
 	err := cmd.Run()

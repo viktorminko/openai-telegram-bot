@@ -23,22 +23,29 @@ func LoadConfig() (*Config, error) {
 
 	viper.AutomaticEnv()
 
-	viper.BindEnv("TELEGRAM_BOT_TOKEN")
-	viper.BindEnv("OPENAI_API_KEY")
-	viper.BindEnv("OPENAI_CHAT_MODEL")
-	viper.BindEnv("OPENAI_TRANSCRIPT_MODEL")
-	viper.BindEnv("IMAGE_SIZE")
-	viper.BindEnv("CONTEXT_SIZE_BYTES")
-	viper.BindEnv("MAX_VOICE_MESSAGE_DURATION")
+	envVars := []string{
+		"TELEGRAM_BOT_TOKEN",
+		"OPENAI_API_KEY",
+		"OPENAI_CHAT_MODEL",
+		"OPENAI_TRANSCRIPT_MODEL",
+		"IMAGE_SIZE",
+		"CONTEXT_SIZE_BYTES",
+		"MAX_VOICE_MESSAGE_DURATION",
+	}
 
-	err := viper.Unmarshal(&cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal config: %v", err)
+	for _, envVar := range envVars {
+		if err := viper.BindEnv(envVar); err != nil {
+			return nil, fmt.Errorf("bind environment variable %s: %v", envVar, err)
+		}
+	}
+
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return nil, fmt.Errorf("unmarshal config: %v", err)
 	}
 
 	validate := validator.New()
 	if err := validate.Struct(&cfg); err != nil {
-		return nil, fmt.Errorf("failed to validate config: %v", err)
+		return nil, fmt.Errorf("validate config: %v", err)
 	}
 
 	return &cfg, nil

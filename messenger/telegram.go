@@ -3,7 +3,7 @@ package messenger
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -90,7 +90,7 @@ func (b *Telegram) SendImage(ctx context.Context, chatID int64, imageURL string)
 		return err
 	}
 
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (b *Telegram) downloadVoiceMessage(fileID string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	bts, err := ioutil.ReadAll(resp.Body)
+	bts, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}

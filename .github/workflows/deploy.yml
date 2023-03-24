@@ -25,11 +25,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Get the latest release tag
+      # Get the latest release or pre-release tag, or set it to v0.0.0 if no tags exist
       - name: Get latest release
         id: latest_release
         run: |
-          LATEST_RELEASE_TAG=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" | jq -r '.tag_name')
+          git fetch --tags
+          LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "::set-output name=latest_release_tag::$LATEST_RELEASE_TAG"
 
       # Generate the new release tag (incrementing the last part of the version number)
@@ -47,7 +48,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/openai-telegram-bot:${{ steps.generate_tag.outputs.release_tag }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/openai-telegram-bot:${{ steps.generate_tag.outputs.release_tag }}
+            ghcr.io/${{ github.repository_owner }}/openai-telegram-bot:latest
 
       # Create the new release on GitHub
       - name: Create Release
