@@ -28,10 +28,13 @@ jobs:
       # Get the latest release or pre-release tag, or set it to v0.0.0 if no tags exist
       - name: Get latest release
         id: latest_release
+        env:
+          LATEST_RELEASE_TAG: ${{ env.LATEST_RELEASE_TAG }}
         run: |
           git fetch --tags
           LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG" >> $GITHUB_ENV
+
 
       # Generate the new release tag (incrementing the last part of the version number)
       - name: Generate new release tag
