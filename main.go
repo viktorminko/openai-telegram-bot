@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/viktorminko/openai-telegram-bot/ai"
 	"github.com/viktorminko/openai-telegram-bot/bot"
@@ -36,7 +35,7 @@ func main() {
 			},
 		),
 		cfg.ContextSizeBytes,
-		1*time.Second,
+		cfg.MaxVoiceMessageDuration,
 	).Run(context.Background())
 	if err != nil {
 		log.Fatalf("new bot: %s", err)
