@@ -3,6 +3,7 @@ package bot
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"time"
@@ -17,7 +18,7 @@ func convertOggToMp3(oggData []byte, duration time.Duration) ([]byte, error) {
 		"ffmpeg",
 		"-i", "pipe:0",
 		"-f", "mp3",
-		"-t", duration.String(),
+		"-t", fmt.Sprintf("%d", int(duration.Seconds())),
 		"-acodec", "libmp3lame",
 		"pipe:1",
 	)
