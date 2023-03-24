@@ -1,0 +1,13 @@
+# Compiled binaries
+/bin/
+
+# Build artifacts
+/vendor/
+
+# IDE files
+.idea/
+
+# Environment variables
+.env
+
+.env
