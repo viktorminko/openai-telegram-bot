@@ -33,7 +33,6 @@ jobs:
           LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG" >> $GITHUB_ENV
 
-
       # Generate the new release tag (incrementing the last part of the version number)
       - name: Generate new release tag
         id: generate_tag
@@ -42,7 +41,6 @@ jobs:
           VERSION=$(echo $LATEST_RELEASE_TAG | awk -F. -v OFS=. '{$NF = sprintf("%0*d", length($NF), ($NF+1)); print}')
           echo "RELEASE_TAG=v$VERSION" >> $GITHUB_ENV
 
-      
       # Build and push the Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
@@ -50,7 +48,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/openai-telegram-bot:${{ steps.generate_tag.outputs.release_tag }}
+            ghcr.io/${{ github.repository_owner }}/openai-telegram-bot:${{ env.RELEASE_TAG }}
             ghcr.io/${{ github.repository_owner }}/openai-telegram-bot:latest
 
       # Create the new release on GitHub
@@ -59,7 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.generate_tag.outputs.release_tag }}
-          release_name: Release ${{ steps.generate_tag.outputs.release_tag }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          release_name: Release ${{ env.RELEASE_TAG }}
           draft: false
           prerelease: false
