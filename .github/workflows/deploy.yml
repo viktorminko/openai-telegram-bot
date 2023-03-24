@@ -31,7 +31,7 @@ jobs:
         run: |
           git fetch --tags
           LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG" >> $GITHUB_ENV
+          echo "::set-output name=latest_release_tag::$LATEST_RELEASE_TAG"
 
       # Generate the new release tag (incrementing the last part of the version number)
       - name: Generate new release tag
@@ -39,9 +39,9 @@ jobs:
         run: |
           LATEST_RELEASE_TAG=${{ steps.latest_release.outputs.latest_release_tag }}
           VERSION=$(echo $LATEST_RELEASE_TAG | awk -F. -v OFS=. '{$NF = sprintf("%0*d", length($NF), ($NF+1)); print}')
-          echo "RELEASE_TAG=$VERSION" >> $GITHUB_ENV
-          echo "::set-output name=release_tag::$VERSION"
-
+          echo "RELEASE_TAG=v$VERSION" >> $GITHUB_ENV
+          echo "::set-output name=release_tag::v$VERSION"
+      
       # Build and push the Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
