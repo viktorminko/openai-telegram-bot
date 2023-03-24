@@ -13,8 +13,11 @@ stop:
 	docker stop $(CONTAINER_NAME)
 	docker rm $(CONTAINER_NAME)
 
+lint-setup:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.1
+
 test:
 	go test -v ./...
 
-lint:
-	golangci-lint run
+lint: lint-setup
+	golangci-lint run ./...
