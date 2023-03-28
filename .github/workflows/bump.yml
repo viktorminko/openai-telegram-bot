@@ -33,7 +33,15 @@ jobs:
           LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG" >> $GITHUB_ENV
 
-
+      - name: Check latest release tag
+        run: |
+          echo "Before fetching tags, LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG"
+          git fetch --tags
+          LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "After fetching tags, LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG"
+          echo "Setting environment variable LATEST_RELEASE_TAG=$LATEST_RELEASE_TAG"
+        env:
+          LATEST_RELEASE_TAG: ${{ env.LATEST_RELEASE_TAG }}
 
       # Generate the new release tag (incrementing the last part of the version number)
       - name: Generate new release tag
