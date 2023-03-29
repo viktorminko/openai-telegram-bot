@@ -34,7 +34,7 @@ func main() {
 				ImageSize:       cfg.ImageSize,
 			},
 		),
-		cfg.ContextSizeBytes,
+		int64(cfg.ContextSizeBytes),
 		cfg.MaxVoiceMessageDuration,
 	).Run(context.Background())
 	if err != nil {
