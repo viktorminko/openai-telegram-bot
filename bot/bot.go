@@ -27,11 +27,11 @@ type Bot struct {
 	bot                     bot
 	client                  aiClient
 	chatContexts            map[int64]*ChatContext
-	maxContextSize          int
+	maxContextSize          int64
 	maxVoiceMessageDuration time.Duration
 }
 
-func NewBot(bot bot, client aiClient, maxContextSize int, maxVoiceMessageDuration time.Duration) *Bot {
+func NewBot(bot bot, client aiClient, maxContextSize int64, maxVoiceMessageDuration time.Duration) *Bot {
 	return &Bot{
 		bot:                     bot,
 		client:                  client,
