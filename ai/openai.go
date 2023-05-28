@@ -19,13 +19,13 @@ type Role string
 
 const (
 	RoleUser      Role = "user"
-	RoleSystem    Role = "system"
 	RoleAssistant Role = "assistant"
 )
 
 type ChatMessage struct {
-	Role Role
-	Text string
+	Role       Role
+	FromUserID int
+	Text       string
 }
 
 type OpenAI struct {
@@ -70,11 +70,14 @@ func (c *OpenAI) Transcript(ctx context.Context, audio io.Reader) (string, error
 		return "", fmt.Errorf("openAI create temp file: %v", err)
 	}
 	defer os.Remove(f.Name())
-	defer f.Close()
 
-	_, err = f.ReadFrom(audio)
+	_, err = io.Copy(f, audio)
 	if err != nil {
 		return "", fmt.Errorf("openAI read audio: %v", err)
+	}
+
+	if err := f.Close(); err != nil {
+		return "", fmt.Errorf("failed to close temp file: %v", err)
 	}
 
 	resp, err := c.client.CreateTranscription(
