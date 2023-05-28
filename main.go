@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"cloud.google.com/go/texttospeech/apiv1/texttospeechpb"
 	"github.com/viktorminko/openai-telegram-bot/ai"
 	"github.com/viktorminko/openai-telegram-bot/bot"
 	"github.com/viktorminko/openai-telegram-bot/config"
@@ -13,7 +14,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadConfig()
+	cfg, err := config.LoadConfig("config.yml")
 	if err != nil {
 		log.Fatalf("error loading config: %v", err)
 	}
@@ -21,6 +22,16 @@ func main() {
 	tgBot, err := tgapi.NewBotAPI(cfg.TelegramBotToken)
 	if err != nil {
 		log.Fatalf("new telegram bot api: %s", err)
+	}
+
+	googleTextToSpeechClient, err := ai.NewGoogleTextToSpeechClient(
+		context.Background(),
+		cfg.GoogleTextToSpeech,
+		ai.WithVoiceSelections(ai.NewVoiceSelector(cfg.GoogleVoicesForUsers, cfg.GoogleDefaultVoice)),
+		ai.WithAudioEncoding(texttospeechpb.AudioEncoding_OGG_OPUS),
+	)
+	if err != nil {
+		log.Fatalf("googleTextToSpeechClient: %s", err)
 	}
 
 	errch, err := bot.NewBot(
@@ -34,6 +45,7 @@ func main() {
 				ImageSize:       cfg.ImageSize,
 			},
 		),
+		googleTextToSpeechClient,
 		int64(cfg.ContextSizeBytes),
 		cfg.MaxVoiceMessageDuration,
 	).Run(context.Background())
@@ -44,5 +56,4 @@ func main() {
 	for err := range errch {
 		log.Printf("error: %s", err)
 	}
-
 }

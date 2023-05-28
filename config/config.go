@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -9,43 +10,40 @@ import (
 )
 
 type Config struct {
-	TelegramBotToken        string        `mapstructure:"TELEGRAM_BOT_TOKEN" validate:"required"`
-	OpenAIApiKey            string        `mapstructure:"OPENAI_API_KEY" validate:"required"`
-	OpenAIChatModel         string        `mapstructure:"OPENAI_CHAT_MODEL" validate:"required"`
-	OpenAITranscriptModel   string        `mapstructure:"OPENAI_TRANSCRIPT_MODEL" validate:"required"`
-	ImageSize               string        `mapstructure:"IMAGE_SIZE" validate:"required"`
-	ContextSizeBytes        int           `mapstructure:"CONTEXT_SIZE_BYTES" validate:"min=1,max=8000"`
-	MaxVoiceMessageDuration time.Duration `mapstructure:"MAX_VOICE_MESSAGE_DURATION" validate:"required,max=60s"`
+	TelegramBotToken        string                    `mapstructure:"TELEGRAM_BOT_TOKEN" validate:"required"`
+	OpenAIApiKey            string                    `mapstructure:"OPENAI_API_KEY" validate:"required"`
+	OpenAIChatModel         string                    `mapstructure:"OPENAI_CHAT_MODEL" validate:"required"`
+	OpenAITranscriptModel   string                    `mapstructure:"OPENAI_TRANSCRIPT_MODEL" validate:"required"`
+	ImageSize               string                    `mapstructure:"IMAGE_SIZE" validate:"required"`
+	ContextSizeBytes        int                       `mapstructure:"CONTEXT_SIZE_BYTES" validate:"min=1,max=8000"`
+	MaxVoiceMessageDuration time.Duration             `mapstructure:"MAX_VOICE_MESSAGE_DURATION" validate:"required,max=60s"`
+	GoogleTextToSpeech      string                    `mapstructure:"GOOGLE_TEXT_TO_SPEECH" validate:"required"`
+	GoogleVoicesForUsers    map[string]map[int]string `mapstructure:"GOOGLE_VOICES" validate:"required"`
+	GoogleDefaultVoice      string                    `mapstructure:"GOOGLE_DEFAULT_VOICE" validate:"required"`
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig(configPath string) (*Config, error) {
 	var cfg Config
 
+	viper.SetConfigFile(configPath)
+	viper.SetConfigType("yaml")
+
+	// Read from .yml file
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("unable to read config from file: %v", err)
+	}
+
+	// Read from environment variables
 	viper.AutomaticEnv()
-
-	envVars := []string{
-		"TELEGRAM_BOT_TOKEN",
-		"OPENAI_API_KEY",
-		"OPENAI_CHAT_MODEL",
-		"OPENAI_TRANSCRIPT_MODEL",
-		"IMAGE_SIZE",
-		"CONTEXT_SIZE_BYTES",
-		"MAX_VOICE_MESSAGE_DURATION",
-	}
-
-	for _, envVar := range envVars {
-		if err := viper.BindEnv(envVar); err != nil {
-			return nil, fmt.Errorf("bind environment variable %s: %v", envVar, err)
-		}
-	}
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("unmarshal config: %v", err)
+		return nil, fmt.Errorf("unable to unmarshal config: %v", err)
 	}
 
 	validate := validator.New()
 	if err := validate.Struct(&cfg); err != nil {
-		return nil, fmt.Errorf("validate config: %v", err)
+		return nil, fmt.Errorf("unable to validate config: %v", err)
 	}
 
 	return &cfg, nil
