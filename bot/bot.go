@@ -100,7 +100,10 @@ func (b *Bot) handleImageCommand(ctx context.Context, msg messenger.Message) err
 func (b *Bot) handleResetCommand(ctx context.Context, chatID int64) error {
 	delete(b.chatContexts, chatID)
 
-	b.bot.SendMessage(ctx, chatID, 0, "Chat context has been reset")
+	_, err := b.bot.SendMessage(ctx, chatID, 0, "Chat context has been reset")
+	if err != nil {
+		return fmt.Errorf("send message: %w", err)
+	}
 
 	return nil
 }
